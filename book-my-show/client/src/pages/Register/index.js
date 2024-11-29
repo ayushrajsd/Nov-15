@@ -1,15 +1,32 @@
 import React from "react";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { Link } from "react-router-dom";
+import { RegisterUser } from "../../api/users";
 
 function Register() {
+  const onFinish = async (values) => {
+    try {
+      const response = await RegisterUser(values);
+      if (response.success) {
+        // success
+        message.success(response.message);
+      } else {
+        // error
+        message.error(response.message);
+      }
+    } catch (err) {
+      console.log(err);
+      message.error(err.message);
+      // error
+    }
+  };
   return (
     <>
       <>
         <main className="App-header">
-          <h1>Login to Book My Show</h1>
+          <h1>Register to Book My Show</h1>
           <section className="mw-500 text-center px-3">
-            <Form layout="vertical">
+            <Form layout="vertical" onFinish={onFinish}>
               <Form.Item
                 label="Name"
                 htmlFor="name"
@@ -58,7 +75,7 @@ function Register() {
             <div>
               <p>
                 {" "}
-                Already a User ? <Link to="/login">Register</Link>
+                Already a User ? <Link to="/login">Login</Link>
               </p>
             </div>
           </section>
