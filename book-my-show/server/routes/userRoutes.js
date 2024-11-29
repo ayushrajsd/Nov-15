@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+const cookies = require("cookie-parser");
 
 const userRouter = express.Router();
 
@@ -41,9 +43,16 @@ userRouter.post("/login", async (req, res) => {
         message: "Password is incorrect",
       });
     }
+    console.log("secret", process.env.JWT_SECRET);
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    console.log("token", token);
+    res.cookie("token", token, { expires: new Date(Date.now() + 86400000) });
     res.send({
       success: true,
       message: "Login Successful",
+      data: token,
     });
   } catch (error) {
     return res.status(500).send(error.message);
