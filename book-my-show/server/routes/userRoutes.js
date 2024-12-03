@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const cookies = require("cookie-parser");
+const auth = require("../middlewares/authMiddleware");
 
 const userRouter = express.Router();
 
@@ -48,7 +49,10 @@ userRouter.post("/login", async (req, res) => {
       expiresIn: "1d",
     });
     console.log("token", token);
-    res.cookie("token", token, { expires: new Date(Date.now() + 86400000) });
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 86400000),
+      httpOnly: true,
+    });
     res.send({
       success: true,
       message: "Login Successful",
@@ -57,6 +61,15 @@ userRouter.post("/login", async (req, res) => {
   } catch (error) {
     return res.status(500).send(error.message);
   }
+});
+
+userRouter.get("/get-current-user", auth, async (req, res) => {
+  const user = await User.findById(req.body.userId).select("-password");
+  res.send({
+    success: true,
+    data: user,
+    message: "You are authorized to go to the protected route",
+  });
 });
 
 module.exports = userRouter;
