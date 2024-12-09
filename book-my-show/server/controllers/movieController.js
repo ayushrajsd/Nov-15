@@ -41,6 +41,7 @@ const updateMovie = async (req, res) => {
     //     message: "Movie not found",
     //   });
     // }
+    console.log("reached updated");
     const movie = await Movie.findByIdAndUpdate(req.body.movieId, req.body, {
       new: true,
     });
