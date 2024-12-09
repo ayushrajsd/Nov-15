@@ -34,7 +34,7 @@ function MovieList() {
     },
   ];
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [movies, setMovies] = useState(FakeMovies);
+  const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [formType, setFormType] = useState("add");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -112,7 +112,7 @@ function MovieList() {
     dispatch(HideLoading()); // loading to false
   };
   useEffect(() => {
-    // getData();
+    getData();
   }, []);
   return (
     <>
