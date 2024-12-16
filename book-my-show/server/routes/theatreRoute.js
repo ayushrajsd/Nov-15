@@ -45,7 +45,7 @@ router.get("/get-all-theatres", async (req, res) => {
     const allTheatres = await Theatre.find().populate("owner");
     res.send({
       success: true,
-      theatres: allTheatres,
+      data: allTheatres,
       message: "All theatres fetched successfully",
     });
   } catch (error) {
@@ -59,7 +59,7 @@ router.get("/get-all-theatres-by-owner/:ownerId", async (req, res) => {
     const allTheatres = await Theatre.find({ owner: req.params.ownerId });
     res.send({
       success: true,
-      theatres: allTheatres,
+      data: allTheatres,
       message: "All theatres fetched successfully",
     });
   } catch (error) {
