@@ -4,6 +4,7 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  baseURL: "/",
 });
 
 // we will use axios interceptors to add token to every request
