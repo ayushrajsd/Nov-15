@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { message, Card, Row, Col, Button } from "antd";
 import moment from "moment";
 import StripeCheckout from "react-stripe-checkout";
+import { bookShow, makePayment } from "../../api/booking";
 
 const BookShow = () => {
   // Redux state and hooks
@@ -38,7 +39,7 @@ const BookShow = () => {
   // Function to generate seat layout dynamically
   const getSeats = () => {
     let columns = 12; // Number of columns for seating arrangement
-    let totalSeats = 120; // Total number of seats
+    let totalSeats = show.totalSeats; // Total number of seats
     let rows = Math.floor(totalSeats / columns); // Calculating number of rows
 
     return (
@@ -118,8 +119,51 @@ const BookShow = () => {
     getData();
   }, []);
 
-  const onToken = (token) => {
+  const book = async (transactionId) => {
+    try {
+      dispatch(ShowLoading());
+      const response = await bookShow({
+        show: params.id,
+        transactionId,
+        seats: selectedSeats,
+        user: user._id,
+      });
+      if (response.success) {
+        message.success("Booking Done Successfully");
+        navigate("/profile");
+      } else {
+        message.error(response.message);
+      }
+      dispatch(HideLoading());
+    } catch (err) {
+      console.log(err);
+      message.error(err.message);
+      dispatch(HideLoading());
+    }
+  };
+
+  const onToken = async (token) => {
     console.log(token);
+    // success on payment then call book show API
+    try {
+      dispatch(ShowLoading());
+      const response = await makePayment(
+        token,
+        selectedSeats.length * show.ticketPrice * 100
+      );
+      if (response.success) {
+        message.success(response.message);
+        book(response.data);
+        console.log(response);
+      } else {
+        message.error(response.message);
+      }
+      dispatch(HideLoading());
+    } catch (err) {
+      console.log(err);
+      message.error(err.message);
+      dispatch(HideLoading());
+    }
   };
 
   // JSX rendering
@@ -163,7 +207,6 @@ const BookShow = () => {
               {selectedSeats.length > 0 && (
                 <StripeCheckout
                   token={onToken}
-                  billingAddress
                   amount={selectedSeats.length * show.ticketPrice * 100}
                   stripeKey="pk_test_51PY5CiRteLJygSvEwi4Zd4R5ZKaKdY8VktV02VTgbK0KA7ATkaEpsK33AmpNQvIYJIZBnbpJuKUO3QG78eFkTH9B00Wyjxc4NL"
                 >
